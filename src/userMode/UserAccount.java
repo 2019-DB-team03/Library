@@ -14,11 +14,11 @@ public class UserAccount { // YAM
 		String dbResult = db.checkIdPw(id, pw);
 		if (dbResult.equals("Connection Error")) {
 			result = "Connection Error";
-		} else if (dbResult.equals("under") || dbResult.equals("post") || dbResult.equals("faculty")) {
+		} else if (dbResult.equals("학부생") || dbResult.equals("대학원생") || dbResult.equals("교직원")) {
 			result += "<p>로그인에 성공했습니다.</p>";
 			result += "<input type=\"button\" onclick = \"location.href='userMain.jsp'\" value=\"확인\">";
 			// 로그인 성공, 진행하기 버튼
-		} else if (dbResult.equals("manager")) {
+		} else if (dbResult.equals("관리자")) {
 			result += "<p>관리자로 로그인에 성공했습니다.</p>";
 			result += "<input type=\"button\" onclick = \"location.href='managerMain.jsp'\" value=\"확인\">";
 			// 관리자 로그인 성공, 진행하기 버튼

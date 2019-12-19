@@ -62,10 +62,10 @@ section {
 				<label for="phone">PHONE</label> <input type="tel" name="phone" id="phone" /><br />
 				<label for="category">CATEGORY</label>
 				<select name="category" id="category">
-					<option value="under" selected="selected">학부생</option>
-					<option value="post">대학원생</option>
-					<option value="faculty">교직원</option>
-					<option value="manager">관리자</option>
+					<option value="학부생" selected="selected">학부생</option>
+					<option value="대학원생">대학원생</option>
+					<option value="교직원">교직원</option>
+					<option value="관리자">관리자</option>
 				</select>
 			</div>
 			<div class="centered" id="btnDiv">
