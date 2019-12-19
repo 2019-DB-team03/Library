@@ -39,6 +39,87 @@ public class DBManage {
 		}
 	}
 	
+	// id와 pw입력을 검사하고 로그인 처리를 해주는 메소드
+	public String checkIdPw(String id, String pw) {
+		String result = "";
+		if (dbConnect()) {
+			try {
+				ResultSet rs = null;
+				String sql = "select * from db_library.member where member_id = ?";
+				pstmt = this.conn.prepareStatement(sql);
+				pstmt.setString(1, id);
+				rs = pstmt.executeQuery();
+				while (rs.next()) {
+					if (rs.getString("member_id").equals(id)) {
+						if (rs.getString("password").equals(pw)) { // id, pw둘다 일치하는 것 찾음
+							result += rs.getString("category");
+
+							// id, pw가 일치할 경우 current에도 추가해줌
+							sql = "select * from db_library.current";
+							pstmt = this.conn.prepareStatement(sql);
+							rs = pstmt.executeQuery();
+							if (rs.next()) { // current에 값이 있는지를 확인하고 있을땐 업데이트 없을땐 insert
+								sql = "update db_library.current set member_id='" + id + "' where member_id='"
+										+ rs.getString("member_id") + "';";
+								pstmt = this.conn.prepareStatement(sql);
+								pstmt.executeUpdate();
+							} else {
+								sql = "insert into db_library.current values ('" + id + "');";
+								pstmt = this.conn.prepareStatement(sql);
+								pstmt.executeUpdate();
+							}
+							break;
+						} else {
+							result += "pw";
+						}
+					} else {
+						result += "id";
+					}
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+				result = "Connection Error";
+			}
+		}
+		dbClose();
+		return result;
+	}// YAM
+
+	// 회원가입을 통해 입력받은 값들을 db에 추가하는 메소드
+	public String checkJoinVal(String name, String id, String pw, String email, String phone, String category) {
+		String result = "";
+		if (dbConnect()) {
+			try {
+				ResultSet rs = null;
+				String sql = "select * from db_library.member where member_id = ?";
+				pstmt = this.conn.prepareStatement(sql);
+				pstmt.setString(1, id);
+				rs = pstmt.executeQuery();
+				while (rs.next()) {
+					if (rs.getString("member_id").equals(id)) {
+						result = "same_id_exists";
+						break;
+					}
+				} // 같은 아이디가 존재하는지 확인함
+				if (!result.equals("same_id_exists")) {
+					// 추가 진행
+					sql = "insert into db_library.member values ('" + id + "','" + pw + "','" + name + "','" + email
+							+ "','" + phone + "','" + category + "',0);";
+					pstmt = this.conn.prepareStatement(sql);
+					pstmt.executeUpdate();
+					result = "ok";
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+				result = "Connection Error";
+			}
+		}
+		dbClose();
+		return result;
+	}// YAM
+
+
+
 	//select
 	
 	//모든 책 목록 

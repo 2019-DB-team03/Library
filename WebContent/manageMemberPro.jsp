@@ -15,7 +15,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
 <title>회원정보 관리 페이지</title>
-</head> 
+</head>
 <body>
 	<div>분류 : <%= searchType %></div>
 	<div>입력한 검색어 : <%= searchContent %></div>
@@ -23,5 +23,4 @@
 	<%= result %></br>
 	<input type="button" onclick="location.href='manageMemberForm.jsp'" value="뒤로가기">
 </body>
- 
 </html>

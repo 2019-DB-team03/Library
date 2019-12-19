@@ -5,16 +5,20 @@
 %>
 
 <%
+	String searchName = request.getParameter("name");
 	String searchId = request.getParameter("id");
 	String searchPw = request.getParameter("pw");
-	String result = uAccount.getLoginState(searchId, searchPw);
+	String searchEmail = request.getParameter("email");
+	String searchPhone = request.getParameter("phone");
+	String searchCategory = request.getParameter("category");
+	String result = uAccount.getJoinState(searchName, searchId, searchPw, searchEmail, searchPhone, searchCategory);
 %>
 <!DOCTYPE html>
 <html lang="ko">
 
 <head>
 <meta charset="utf-8">
-<title>Main</title>
+<title>JOIN</title>
 <style type="text/css">
 html, body {
 	width: 100%;
@@ -31,9 +35,9 @@ html, body {
 
 section {
 	position: absolute;
-	height: 150px;
+	height: 300px;
 	width: 300px;
-	top: calc(40% - 75px);
+	top: calc(40% - 100px);
 	left: calc(50% - 150px);
 }
 
