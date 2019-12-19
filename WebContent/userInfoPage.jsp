@@ -19,8 +19,8 @@
 <body>
 	<section>
 		<form action="update.jsp" method="post">
-	<%=result%>
-	</form>
+			<%=result%>
+		</form>
 	</section>
 </body>
 <script>

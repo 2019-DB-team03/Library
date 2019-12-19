@@ -18,7 +18,9 @@
 </head>
 <body>
 	<section>
+		<form action="update.jsp" method="post">
 			<%=result%>
+		</form>
 	</section>
 </body>
 <script>

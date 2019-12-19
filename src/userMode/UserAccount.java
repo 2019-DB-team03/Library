@@ -116,7 +116,7 @@ public class UserAccount { // YAM
 	// current user의 정보를 업데이트하는 메소드
 	public static String updateUser(String id, String pw, String name, String email, String phone, String category) {
 		String result = "";
-		
+
 		String a = db.updateMember(id, "password", pw);
 		String b = db.updateMember(id, "name", name);
 		String c = db.updateMember(id, "email", email);

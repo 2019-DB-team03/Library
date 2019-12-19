@@ -6,7 +6,7 @@
 %>
 
 <%
-String id = request.getParameter("id");
+	String id = request.getParameter("id");
 	String result = uAccount.leaveUser(id);
 %>
 <!DOCTYPE html>

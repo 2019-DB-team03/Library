@@ -12,7 +12,8 @@
 	String searchEmail = request.getParameter("email");
 	String searchPhone = request.getParameter("phone");
 	String searchCategory = request.getParameter("category");
-	String result = uAccount.updateUser(searchId,searchPw,searchName,searchEmail,searchPhone,searchCategory);
+	String result = uAccount.updateUser(searchId, searchPw, searchName, searchEmail, searchPhone,
+			searchCategory);
 %>
 <!DOCTYPE html>
 <html>
@@ -22,7 +23,7 @@
 </head>
 <body>
 	<section>
-	<%=result%>
+		<%=result%>
 	</section>
 </body>
 </html>
