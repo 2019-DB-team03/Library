@@ -118,83 +118,198 @@ public class DBManage {
 		return result;
 	}// YAM
 
-
-
-	//select
-	
-	//모든 책 목록 
-	
-	public String select_allBook() {
-		String result = null;
-		if(dbConnect()) {
+	// 비밀번호 체크
+	public String checkPw(String pw) {
+		String result = "";
+		if (dbConnect()) {
 			try {
-				String sql="";
 				ResultSet rs = null;
-				//책제목 , isbn, 저자, 출판사, 책번호, 예약/대여
-				sql = "select * from db_library.book order by binary(title)";
+				String sql = "select * from db_library.current";
 				pstmt = this.conn.prepareStatement(sql);
 				rs = pstmt.executeQuery();
-				if (rs.next()) {
-					result = rs.getString("title") + "|" + rs.getString("isbn") + "|" + rs.getString("author")
-								+ "|" + rs.getString("publisher")+ "|" + rs.getString("book_id")
-								+ "|" + rs.getString("isavailable") + "*";
-				}
-				while (rs.next()) {
-					result += rs.getString("title") + "|" + rs.getString("isbn") + "|" + rs.getString("author")
-								+ "|" + rs.getString("publisher")+ "|" + rs.getString("book_id")
-								+ "|" + rs.getString("isavailable") + "*";
+				if (rs.next()) { // current에 값이 있는지를 확인하고 있을때 그 pw비교함
+					sql = "select * from db_library.member where member_id='" + rs.getString("member_id") + "';";
+					pstmt = this.conn.prepareStatement(sql);
+					rs = pstmt.executeQuery();
+					if (rs.next()) {
+						if (rs.getString("password").equals(pw)) {
+							result += "yes_pw"; // 비번을 current에 있는 계정과 맞게 입력햇을 경우
+						} else {
+							result += "no_pw";
+						}
+					} else {
+						result += "unknown_error";
+					}
+				} else {
+					result = "no_loginUser";
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();
+				result = "Connection Error";
 			}
-			
 		}
 		dbClose();
 		return result;
 	}
-	
-	//책 유형과 입력받은 내용에 따른 책 목록
+
+	// 입력된 id의 유저의 정보를 리턴
+	public String userData(String id) {
+		String result = "";
+		if (dbConnect()) {
+			try {
+				ResultSet rs = null;
+				String sql = "select * from db_library.member where member_id='" + id + "';";
+				pstmt = this.conn.prepareStatement(sql);
+				rs = pstmt.executeQuery();
+				if (rs.next()) {
+					result = ""+rs.getString("member_id") + "|" + rs.getString("password") + "|" + rs.getString("name")
+							+ "|" + rs.getString("email") + "|" + rs.getString("phone") + "|"
+							+ rs.getString("category") + "|" + rs.getString("total_loan")+"";
+				} else {
+					result += "no_logined_user";
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+				result = "Connection Error";
+			}
+		}
+		dbClose();
+		return result;
+	}
+
+	// 현재 멤버의 아이디를 리턴
+	public String currentUserId() {
+		String result = "";
+		if (dbConnect()) {
+			try {
+				ResultSet rs = null;
+				String sql = "select * from db_library.current";
+				pstmt = this.conn.prepareStatement(sql);
+				rs = pstmt.executeQuery();
+				if (rs.next()) {
+					return rs.getString("member_id");
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+				result = "Connection Error";
+			}
+		}
+		dbClose();
+		return result;
+	}
+
+	// id의 멤버를 삭제하는 메소드
+	public String deleteMember(String id) {
+		String result = "";
+		if (dbConnect()) {
+			try {
+				ResultSet rs = null;
+				String sql = "delete from db_library.member where member_id='" + id + "';";
+				pstmt = this.conn.prepareStatement(sql);
+				pstmt.executeUpdate();
+				return "ok";
+			} catch (SQLException e) {
+				e.printStackTrace();
+				result = "Connection Error";
+			}
+		}
+		dbClose();
+		return result;
+	}
+
+	// id의 정보를 수정하는 메소드
+	public String updateMember(String id, String col, String editVal) {
+		String result = "";
+		if (dbConnect()) {
+			try {
+				ResultSet rs = null;
+				String sql = "update db_library.member set "+col+"='"+editVal+"' where member_id='"+id+"';";
+				pstmt = this.conn.prepareStatement(sql);
+				pstmt.executeUpdate();
+				return "ok";
+			} catch (SQLException e) {
+				e.printStackTrace();
+				result = "Connection Error";
+			}
+		}
+		dbClose();
+		return result;
+	}
+
+	// select
+
+	// 모든 책 목록
+
+	public String select_allBook() {
+		String result = null;
+		if (dbConnect()) {
+			try {
+				String sql = "";
+				ResultSet rs = null;
+				// 책제목 , isbn, 저자, 출판사, 책번호, 예약/대여
+				sql = "select * from db_library.book order by binary(title)";
+				pstmt = this.conn.prepareStatement(sql);
+				rs = pstmt.executeQuery();
+				if (rs.next()) {
+					result = rs.getString("title") + "|" + rs.getString("isbn") + "|" + rs.getString("author") + "|"
+							+ rs.getString("publisher") + "|" + rs.getString("book_id") + "|"
+							+ rs.getString("isavailable") + "*";
+				}
+				while (rs.next()) {
+					result += rs.getString("title") + "|" + rs.getString("isbn") + "|" + rs.getString("author") + "|"
+							+ rs.getString("publisher") + "|" + rs.getString("book_id") + "|"
+							+ rs.getString("isavailable") + "*";
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+
+		}
+		dbClose();
+		return result;
+	}
+
+	// 책 유형과 입력받은 내용에 따른 책 목록
 	public String select_searchBook(String type, String content) {
 		String result = null;
 		if (dbConnect()) {
 			try {
 				String sql = "";
 				ResultSet rs = null;
-	
-				if(type.equals("ISBN")) {
+
+				if (type.equals("ISBN")) {
 					sql = "select * from db_library.book where isbn = ? order by binary(title)";
 					pstmt = this.conn.prepareStatement(sql);
 					pstmt.setString(1, content);
-					
+
 					rs = pstmt.executeQuery();
-					
+
 					if (rs.next()) {
-						result = rs.getString("title") + "|" + rs.getString("isbn") + "|" + rs.getString("author") +"|"
-								+ rs.getString("publisher") + "|" + rs.getString("book_id") + "|" + rs.getString("isavailable")
-								+ "*";
+						result = rs.getString("title") + "|" + rs.getString("isbn") + "|" + rs.getString("author") + "|"
+								+ rs.getString("publisher") + "|" + rs.getString("book_id") + "|"
+								+ rs.getString("isavailable") + "*";
 					}
 					while (rs.next()) {
-						result += rs.getString("title") + "|" + rs.getString("isbn") + "|" + rs.getString("author") +"|"
-								+ rs.getString("publisher") + "|" + rs.getString("book_id") + "|" + rs.getString("isavailable")
-								+ "*";
+						result += rs.getString("title") + "|" + rs.getString("isbn") + "|" + rs.getString("author")
+								+ "|" + rs.getString("publisher") + "|" + rs.getString("book_id") + "|"
+								+ rs.getString("isavailable") + "*";
 					}
-				}
-				else if(type.equals("제목")) {
+				} else if (type.equals("제목")) {
 					sql = "select * from db_library.book where title = ? order by binary(title)";
-					
+
 					pstmt = this.conn.prepareStatement(sql);
 					pstmt.setString(1, content);
-					
+
 					rs = pstmt.executeQuery();
 					if (rs.next()) {
-						result = rs.getString("title") + "|" + rs.getString("isbn") + "|" + rs.getString("author")  +"|"
-								+ rs.getString("publisher") + "|" + rs.getString("book_id") + "|" + rs.getString("isavailable")
-								+ "*";
+						result = rs.getString("title") + "|" + rs.getString("isbn") + "|" + rs.getString("author") + "|"
+								+ rs.getString("publisher") + "|" + rs.getString("book_id") + "|"
+								+ rs.getString("isavailable") + "*";
 					}
 					while (rs.next()) {
-						result += rs.getString("title") + "|" + rs.getString("isbn") + "|" + rs.getString("author")  +"|"
-								+ rs.getString("publisher") + "|" + rs.getString("book_id") + "|" + rs.getString("isavailable")
-								+ "*";
+						result += rs.getString("title") + "|" + rs.getString("isbn") + "|" + rs.getString("author")
+								+ "|" + rs.getString("publisher") + "|" + rs.getString("book_id") + "|"
+								+ rs.getString("isavailable") + "*";
 					}
 				}
 				if (rs != null) {
@@ -207,24 +322,24 @@ public class DBManage {
 		dbClose();
 		return result;
 	}
-	
+
 	public String select_allMember() {
 		String result = null;
 		if (dbConnect()) {
 			try {
-				String sql="";
+				String sql = "";
 				ResultSet rs = null;
-				//이름, 회원 아이디, 대출권수
+				// 이름, 회원 아이디, 대출권수
 				sql = "select * from db_library.member order by total_loan desc";
 				pstmt = this.conn.prepareStatement(sql);
 				rs = pstmt.executeQuery();
 				if (rs.next()) {
-					result = rs.getString("name") + "|" + rs.getString("member_id") + "|" + rs.getString("category") + "|" + rs.getString("total_loan")
-								+ "*";
+					result = rs.getString("name") + "|" + rs.getString("member_id") + "|" + rs.getString("category")
+							+ "|" + rs.getString("total_loan") + "*";
 				}
 				while (rs.next()) {
-					result += rs.getString("name") + "|" + rs.getString("member_id") + "|" + rs.getString("category") + "|" + rs.getString("total_loan")
-								+ "*";
+					result += rs.getString("name") + "|" + rs.getString("member_id") + "|" + rs.getString("category")
+							+ "|" + rs.getString("total_loan") + "*";
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -233,65 +348,62 @@ public class DBManage {
 		dbClose();
 		return result;
 	}
+
 	public String select_searchMember(String type, String content) {
 		String result = null;
 		if (dbConnect()) {
 			try {
 				String sql = "";
 				ResultSet rs = null;
-				if(content.equals("") == false) {	//이름 + 부류 둘 다 입력
-					if(type.equals("학부생")) {
+				if (content.equals("") == false) { // 이름 + 부류 둘 다 입력
+					if (type.equals("학부생")) {
 						sql = "select * from db_library.member where category = ? and name = ? order by total_loan desc";
 						pstmt = this.conn.prepareStatement(sql);
 						pstmt.setString(1, type);
 						pstmt.setString(2, content);
-					}
-					else if(type.equals("대학원생")) {
+					} else if (type.equals("대학원생")) {
 						sql = "select * from db_library.member where category = ? and name = ? order by total_loan desc";
 						pstmt = this.conn.prepareStatement(sql);
 						pstmt.setString(1, type);
 						pstmt.setString(2, content);
-					}
-					else if(type.equals("교직원")) {
+					} else if (type.equals("교직원")) {
 						sql = "select * from db_library.member where category = ? and name = ? order by total_loan desc";
 						pstmt = this.conn.prepareStatement(sql);
 						pstmt.setString(1, type);
 						pstmt.setString(2, content);
-					}
-					else {	//전체 중에서 사람 이름만으로 검색
+					} else { // 전체 중에서 사람 이름만으로 검색
 						sql = "select * from db_library.member where name = ? order by total_loan desc";
 						pstmt = this.conn.prepareStatement(sql);
 						pstmt.setString(1, content);
 					}
 
 					rs = pstmt.executeQuery();
-					
+
 					if (rs.next()) {
-						result = rs.getString("name") + "|" + rs.getString("member_id") + "|" + rs.getString("category") + "|" + rs.getString("total_loan")
-									+ "*";
+						result = rs.getString("name") + "|" + rs.getString("member_id") + "|" + rs.getString("category")
+								+ "|" + rs.getString("total_loan") + "*";
 					}
 					while (rs.next()) {
-						result += rs.getString("name") + "|" + rs.getString("member_id") + "|" + rs.getString("category") + "|" + rs.getString("total_loan")
-									+ "*";
+						result += rs.getString("name") + "|" + rs.getString("member_id") + "|"
+								+ rs.getString("category") + "|" + rs.getString("total_loan") + "*";
 					}
-				}
-				else {	//이름 입력 안한 경우, 부류 별 전체 출력
+				} else { // 이름 입력 안한 경우, 부류 별 전체 출력
 					sql = "select * from db_library.member where category = ? order by total_loan desc";
 					pstmt = this.conn.prepareStatement(sql);
 					pstmt.setString(1, type);
-					
+
 					rs = pstmt.executeQuery();
-					
+
 					if (rs.next()) {
-						result = rs.getString("name") + "|" + rs.getString("member_id") + "|" + rs.getString("category") + "|" + rs.getString("total_loan")
-									+ "*";
+						result = rs.getString("name") + "|" + rs.getString("member_id") + "|" + rs.getString("category")
+								+ "|" + rs.getString("total_loan") + "*";
 					}
 					while (rs.next()) {
-						result += rs.getString("name") + "|" + rs.getString("member_id") + "|" + rs.getString("category") + "|" + rs.getString("total_loan")
-									+ "*";
+						result += rs.getString("name") + "|" + rs.getString("member_id") + "|"
+								+ rs.getString("category") + "|" + rs.getString("total_loan") + "*";
 					}
 				}
-				
+
 				if (rs != null) {
 					rs.close();
 				}
@@ -302,24 +414,24 @@ public class DBManage {
 		dbClose();
 		return result;
 	}
-	
+
 	public String select_book(int book_id) {
 		String result = null;
 		if (dbConnect()) {
 			try {
 				String sql = "";
 				ResultSet rs = null;
-	
+
 				sql = "select * from db_library.book where book_id = ?";
 				pstmt = this.conn.prepareStatement(sql);
 				pstmt.setInt(1, book_id);
-				
+
 				rs = pstmt.executeQuery();
-				
+
 				if (rs.next()) {
-					result = rs.getString("title") + "|" + rs.getString("isbn") + "|" + rs.getString("author") +"|"
-							+ rs.getString("publisher") + "|" + rs.getString("book_id") + "|" + rs.getString("isavailable")
-							+ "*";
+					result = rs.getString("title") + "|" + rs.getString("isbn") + "|" + rs.getString("author") + "|"
+							+ rs.getString("publisher") + "|" + rs.getString("book_id") + "|"
+							+ rs.getString("isavailable") + "*";
 				}
 				if (rs != null) {
 					rs.close();
@@ -331,14 +443,14 @@ public class DBManage {
 		dbClose();
 		return result;
 	}
-	
+
 	public String select_currentUser() {
 		String result = null;
-		if(dbConnect()) {
+		if (dbConnect()) {
 			try {
-				String sql="";
+				String sql = "";
 				ResultSet rs = null;
-				//책제목 , isbn, 저자, 출판사, 책번호, 예약/대여
+				// 책제목 , isbn, 저자, 출판사, 책번호, 예약/대여
 				sql = "select * from db_library.current";
 				pstmt = this.conn.prepareStatement(sql);
 				rs = pstmt.executeQuery();
@@ -348,24 +460,24 @@ public class DBManage {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			
+
 		}
 		dbClose();
 		return result;
 	}
-	
+
 	public boolean select_isReserve(String member_id, int book_id) {
 		boolean result = false;
-		if(dbConnect()) {
+		if (dbConnect()) {
 			try {
-				String sql="";
+				String sql = "";
 				ResultSet rs = null;
-				//책제목 , isbn, 저자, 출판사, 책번호, 예약/대여
+				// 책제목 , isbn, 저자, 출판사, 책번호, 예약/대여
 				sql = "select book_id from db_library.reservation where member_id = ? and book_id = ?";
 				pstmt = this.conn.prepareStatement(sql);
 				pstmt.setString(1, member_id);
 				pstmt.setInt(2, book_id);
-				
+
 				rs = pstmt.executeQuery();
 				if (rs.next()) {
 					result = true;
@@ -373,24 +485,24 @@ public class DBManage {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			
+
 		}
 		dbClose();
 		return result;
 	}
-	
+
 	public boolean select_isLoan(String member_id, int book_id) {
 		boolean result = false;
-		if(dbConnect()) {
+		if (dbConnect()) {
 			try {
-				String sql="";
+				String sql = "";
 				ResultSet rs = null;
-				//책제목 , isbn, 저자, 출판사, 책번호, 예약/대여
+				// 책제목 , isbn, 저자, 출판사, 책번호, 예약/대여
 				sql = "select book_id from db_library.loan where member_id = ? and book_id = ?";
 				pstmt = this.conn.prepareStatement(sql);
 				pstmt.setString(1, member_id);
 				pstmt.setInt(2, book_id);
-				
+
 				rs = pstmt.executeQuery();
 				if (rs.next()) {
 					result = true;
@@ -398,13 +510,13 @@ public class DBManage {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			
+
 		}
 		dbClose();
 		return result;
 	}
-	
-	//delete
+
+	// delete
 	public String delete_book(int book_id) {
 		String str = null;
 		if (dbConnect()) {
@@ -423,7 +535,7 @@ public class DBManage {
 					pstmt.executeUpdate();
 					str = "success";
 				}
-				
+
 			} catch (SQLException e) {
 				e.printStackTrace();
 				return null;
@@ -432,11 +544,10 @@ public class DBManage {
 		dbClose();
 		return str;
 	}
-	
-	
-	//insert
+
+	// insert
 	public String insert_book(String title, String isbn, String author, String publisher) {
-		String ret ="";
+		String ret = "";
 		if (dbConnect()) {
 			try {
 				ResultSet rs = null;
@@ -449,7 +560,7 @@ public class DBManage {
 
 					sql = "insert into db_library.book values(?, ?, ?, ?, ?, ?)";
 					pstmt = this.conn.prepareStatement(sql);
-					
+
 					pstmt.setString(1, title);
 					pstmt.setString(2, isbn);
 					pstmt.setString(3, author);
@@ -464,14 +575,13 @@ public class DBManage {
 				ret = "도서 등록을 실패하였습니다.";
 			}
 		}
-		
+
 		dbClose();
 		return ret;
 	}
-	
-	
-	//update
-	public boolean update_book(int book_id,String title, String isbn, String author, String publisher) {
+
+	// update
+	public boolean update_book(int book_id, String title, String isbn, String author, String publisher) {
 		if (dbConnect()) {
 			try {
 				String sql = "update db_library.book set title = ?, isbn = ?, author = ?, publisher = ? where book_id = ?";
@@ -488,7 +598,7 @@ public class DBManage {
 				return false;
 			}
 		}
-		
+
 		dbClose();
 		return false;
 	}

@@ -11,6 +11,16 @@
 	<input type="button" onclick="location.href='userSearchBookForm.jsp'" value="도서 검색 &예약&대출"></br></br>
 	<input type="button" onclick="location.href='email_addChooseRForm.jsp'" value="취소"></br></br>
 	<input type="button" onclick="location.href='email_addChooseRForm.jsp'" value="취소"></br></br>
-	<input type="button" onclick="location.href='email_addChooseRForm.jsp'" value="취소"></br></br>
+	<input type="button" id="myInfoBtn" value="내 정보 관리"></br></br>
 </body>
+<script>
+document.getElementById("myInfoBtn").addEventListener("click",toJoinFun);
+function toJoinFun(){
+	var jbResult = prompt('비밀번호를 입력해 주세요','');
+	if(jbResult=="" || jbResult==null){
+	}else{
+		location.href="userInfoPage.jsp?pw="+jbResult;
+	}	
+}
+</script>
 </html> 
